@@ -1,4 +1,11 @@
 {
+  "name": "Social",
+  "description": "Social Media Project",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon index.js"
+  },
   "dependencies": {
     "cloudinary": "^2.3.1",
     "cors": "^2.8.5",
