@@ -20,7 +20,7 @@ export default function FormDialog() {
     const imgInputRef = React.useRef(null);
     const [userName, setUserName] = React.useState( user ? user.name : undefined);
     const [userAbout, setUserAbout] = React.useState(user ? user.about : undefined);
-    const [userAvatar, setUserAvatar] = React.useState(user && user.avatar.url ? user.avatar.url : undefined);
+    const [userAvatar, setUserAvatar] = React.useState(user && user.avatar ? user.avatar.url : undefined);
     const [userEmail, setUserEmail] = React.useState(user ? user.email : undefined);
     const [userPassword, setUserPassword] = React.useState(user ? user.password : undefined);
     const token = localStorage.getItem('token'); // Make sure 'token' is the string key
