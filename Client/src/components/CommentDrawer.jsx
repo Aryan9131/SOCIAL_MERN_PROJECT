@@ -21,9 +21,9 @@ import { useEffect } from 'react';
 import CommentIcon from '@mui/icons-material/Comment';
 
 export default function FormDialog(props) {
-    console.log("props --> "+JSON.stringify(props))
-    const { postComments, setPostComments, postId }=props;
-    const {commentData, setCommentData, updatedCommentData, setUpdatedCommentData, handleCommentSubmit, handleEditCommentSubmit, handleCommentDelete}=props
+    console.log("props --> " + JSON.stringify(props))
+    const { postComments, setPostComments, postId } = props;
+    const { commentData, setCommentData, updatedCommentData, setUpdatedCommentData, handleCommentSubmit, handleEditCommentSubmit, handleCommentDelete } = props
 
     const [open, setOpen] = React.useState(false);
     let user = useSelector((state) => state.user).user;
@@ -52,7 +52,7 @@ export default function FormDialog(props) {
         obj[commentId] = value
         setReadOnlyStates((prev) => ({ ...prev, ...obj }))
     }
-   
+
 
     return (
         <React.Fragment>
@@ -66,113 +66,110 @@ export default function FormDialog(props) {
                 PaperProps={{
                     component: 'form',
                     onSubmit: (e) => {
-                      e.preventDefault();
-                      handleCommentSubmit(postId, setPostComments);
+                        e.preventDefault();
+                        handleCommentSubmit(postId, setPostComments);
                     },
-                  }}
+                }}
             >
                 <DialogTitle>Post Comments</DialogTitle>
                 <DialogContent sx={{ position: "relative" }} >
-                        <List sx={{ width: '100%', minWidth: 400, height: { xs: "100vh", sm: 400, md: 300 }, boxSizing: "border-box", overflowY: "scroll", bgcolor: 'background.paper' }}>
-                            {
-                                postComments.length > 0
-                                    ?
-                                    postComments.map((comment, key) => {
-                                        const readOnly = readOnlyStates[comment._id]
-                                        return (
-                                            <>
-                                                <ListItem alignItems="flex-start" id={comment._id}>
-                                                    <ListItemAvatar >
-                                                        <Avatar alt="Remy Sharp" sx={{ width: 34, height: 34 }} src="https://mui.com/static/images/avatar/3.jpg" />
-                                                    </ListItemAvatar>
-                                                    <ListItemText
-                                                        primary={comment.user ? comment.user.name : 'guest'}
-                                                        secondary={
-                                                            <React.Fragment>
+                    <List sx={{ width: '100%', minWidth: 400, height: { xs: "100vh", sm: 400, md: 300 }, boxSizing: "border-box", overflowY: "scroll", bgcolor: 'background.paper' }}>
+                        {
+                            postComments.length > 0
+                                ?
+                                postComments.map((comment, key) => {
+                                    const readOnly = readOnlyStates[comment._id]
+                                    return (
+                                        <Box sx={{ display: 'flex', flexDirection: 'column' }} key={comment._id} id={comment._id}>
+                                            <ListItem alignItems="flex-start">
+                                                <ListItemAvatar>
+                                                    <Avatar alt="Remy Sharp" sx={{ width: 34, height: 34 }} src="https://mui.com/static/images/avatar/3.jpg" />
+                                                </ListItemAvatar>
 
-                                                                <Box id='editComment' >
-                                                                    <TextField
-                                                                        id={comment._id + "_textField"}
-                                                                        multiline
-                                                                        maxRows={6}
-                                                                        variant="standard"
-                                                                        InputProps={{
-                                                                            readOnly: readOnly,
-                                                                        }}
-                                                                        value={readOnly ? comment.data : updatedCommentData}
-                                                                        onChange={(e) => setUpdatedCommentData(e.target.value)}
-                                                                        sx={{
-                                                                            width: "100%",
-                                                                            '& .MuiInput-underline:before': {
-                                                                                borderBottom: 'none',
-                                                                            },
-                                                                            '& .MuiInput-underline:hover:before': {
-                                                                                borderBottom: 'none',
-                                                                            },
-                                                                            '& .MuiInput-underline:after': {
-                                                                                borderBottom: 'none',
-                                                                            },
-                                                                            '& .MuiInput-underline :hover': {
-                                                                                borderBottom: 'none'
-                                                                            }
-                                                                        }}
-                                                                    />
-                                                                    <Box sx={{
-                                                                        display: readOnlyStates[comment._id] ? 'none' : 'flex',
-                                                                        justifyContent: 'space-between', textTransform: 'lowercase',
-                                                                        borderTop:"1px solid black"
-                                                                       }}>
-                                                                    <Button size="small"
-                                                                       aria-label="cancel"
-                                                                        onClick={(event) => {
-                                                                            handleReadOnlyStates(comment._id, true)
-                                                                            setUpdatedCommentData("");
-                                                                          }}
-                                                                    >
-                                                                        cancel
-                                                                    </Button>
-                                                                    <Button size="small" 
-                                                                       aria-label="edit"
-                                                                        onClick={(event) => {
-                                                                            event.preventDefault();
-                                                                            handleEditCommentSubmit(comment._id, setPostComments)
-                                                                        }} >
-                                                                        edit
-                                                                    </Button>
-                                                                    </Box>
-                                                                </Box>
+                                                <Box sx={{ flexGrow: 1 }}>
+                                                    <Typography variant="body1">
+                                                        {comment.user ? comment.user.name : 'guest'}
+                                                    </Typography>
+                                                    <Box id='editComment'>
+                                                        <TextField
+                                                            id={comment._id + "_textField"}
+                                                            multiline
+                                                            maxRows={6}
+                                                            variant="standard"
+                                                            InputProps={{
+                                                                readOnly: readOnly,
+                                                            }}
+                                                            value={readOnly ? comment.data : updatedCommentData}
+                                                            onChange={(e) => setUpdatedCommentData(e.target.value)}
+                                                            sx={{
+                                                                width: "100%",
+                                                                '& .MuiInput-underline:before': {
+                                                                    borderBottom: 'none',
+                                                                },
+                                                                '& .MuiInput-underline:hover:before': {
+                                                                    borderBottom: 'none',
+                                                                },
+                                                                '& .MuiInput-underline:after': {
+                                                                    borderBottom: 'none',
+                                                                },
+                                                                '& .MuiInput-underline:hover': {
+                                                                    borderBottom: 'none'
+                                                                }
+                                                            }}
+                                                        />
+                                                        <Box sx={{
+                                                            display: readOnlyStates[comment._id] ? 'none' : 'flex',
+                                                            justifyContent: 'space-between',
+                                                            textTransform: 'lowercase',
+                                                            borderTop: "1px solid black"
+                                                        }}>
+                                                            <Button size="small"
+                                                                aria-label="cancel"
+                                                                onClick={(event) => {
+                                                                    handleReadOnlyStates(comment._id, true);
+                                                                    setUpdatedCommentData("");
+                                                                }}
+                                                            >
+                                                                cancel
+                                                            </Button>
+                                                            <Button size="small"
+                                                                aria-label="edit"
+                                                                onClick={(event) => {
+                                                                    event.preventDefault();
+                                                                    handleEditCommentSubmit(comment._id, setPostComments);
+                                                                }}
+                                                            >
+                                                                edit
+                                                            </Button>
+                                                        </Box>
+                                                    </Box>
+                                                </Box>
 
-                                                            </React.Fragment>
-                                                        }
-                                                    />
+                                                {/* to Edit the comments */}
+                                                {
+                                                    (comment.user._id.toString() === user._id.toString()) &&
+                                                        readOnlyStates[comment._id] ? (
+                                                        <MenuPopper commentId={comment._id}
+                                                            handleReadOnlyStates={handleReadOnlyStates}
+                                                            setPostComments={setPostComments}
+                                                            handleCommentDelete={handleCommentDelete}
+                                                            setUpdatedCommentData={setUpdatedCommentData}
+                                                            commentData={comment.data}
+                                                            postId={postId}
+                                                        />
+                                                    ) : null
+                                                }
 
-                                                    {/* to Edit the comments */}
-                                                    {
-                                                      (comment.user._id.toString() == user._id.toString())
-                                                         &&
-                                                        readOnlyStates[comment._id] 
-                                                        ? 
-                                                        <MenuPopper commentId={comment._id} 
-                                                                        handleReadOnlyStates={handleReadOnlyStates}
-                                                                        setPostComments={setPostComments} 
-                                                                        handleCommentDelete={handleCommentDelete}
-                                                                        setUpdatedCommentData={setUpdatedCommentData}
-                                                                        commentData={comment.data} 
-                                                                        postId={postId}
-                                                         />
-                                                        : 
-                                                        null
-                                                    }
+                                            </ListItem>
 
-                                                </ListItem>
-
-                                                <Divider variant="inset" component="li" />
-                                            </>)
-                                    })
-                                    :
-                                    "Be the first to comment :)"
-                            }
-                        </List>
+                                            <Divider variant="inset" component="li" />
+                                        </Box>
+                                    )
+                                })
+                                :
+                                "Be the first to comment :)"
+                        }
+                    </List>
                     <TextField
                         autoFocus
                         required

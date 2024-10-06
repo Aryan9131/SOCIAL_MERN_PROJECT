@@ -256,8 +256,8 @@ export default function Profile({ handleCardClick, open, toggleDrawer, clickedPo
        clickedPost
         ?
         <Grid item xs={8} sm={4} md={3} sx={{ display: "flex", justifyContent: "center" }}>
-        <DrawerTemplate open={open} toggleDrawer={toggleDrawer} clickedPost={clickedPost} />
-      </Grid>
+          <DrawerTemplate open={open} toggleDrawer={toggleDrawer} clickedPost={clickedPost} />
+         </Grid>
       :
       null
       }

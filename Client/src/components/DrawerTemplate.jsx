@@ -9,6 +9,8 @@ import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { Typography } from '@mui/material';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
+import ListItemSecondaryAction from '@mui/material/ListItemSecondaryAction';
+
 import Divider from '@mui/material/Divider';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemAvatar from '@mui/material/ListItemAvatar';
@@ -18,33 +20,33 @@ import SendIcon from '@mui/icons-material/Send';
 import MenuPopper from './MenuPopper';
 
 export default function DrawerTemplate(props) {
-  const { open, toggleDrawer, clickedPost }=props;
-  const {commentData, setCommentData, updatedCommentData, setUpdatedCommentData, handleCommentSubmit, handleEditCommentSubmit, handleCommentDelete}=props
+  const { open, toggleDrawer, clickedPost } = props;
+  const { commentData, setCommentData, updatedCommentData, setUpdatedCommentData, handleCommentSubmit, handleEditCommentSubmit, handleCommentDelete } = props
   let user = useSelector((state) => state.user).user;
   const token = localStorage.getItem('token'); // Make sure 'token' is the string key
   const [fetchedPost, setFetchedPost] = React.useState(undefined);
-  const [postComments, setPostComments]=React.useState([]);
+  const [postComments, setPostComments] = React.useState([]);
   const [readOnlyStates, setReadOnlyStates] = React.useState({});
-  const eventDate=new Date(fetchedPost ? fetchedPost.date : '')
-  const eventTime=new Date(fetchedPost ? fetchedPost.time : '')
+  const eventDate = new Date(fetchedPost ? fetchedPost.date : '')
+  const eventTime = new Date(fetchedPost ? fetchedPost.time : '')
   const handleReadOnlyStates = (commentId, value) => {
     let obj = {};
     obj[commentId] = value
     setReadOnlyStates((prev) => ({ ...prev, ...obj }))
-}
- React.useEffect(()=>{
-      console.log("UpdatedComment data value -->"+updatedCommentData)
- },[updatedCommentData])
+  }
   React.useEffect(() => {
-    if(clickedPost.postType=='Post'){
+    console.log("UpdatedComment data value -->" + updatedCommentData)
+  }, [updatedCommentData])
+  React.useEffect(() => {
+    if (clickedPost.postType == 'Post') {
       let obj = {}
-    postComments.map((comment) => {
+      postComments.map((comment) => {
         const commentId = comment._id
         obj[commentId] = true;
-    })
-    setReadOnlyStates(obj)
+      })
+      setReadOnlyStates(obj)
     }
-}, [postComments])
+  }, [postComments])
   React.useEffect(() => {
     if (clickedPost && clickedPost._id) {
       const getPost = async () => {
@@ -68,11 +70,11 @@ export default function DrawerTemplate(props) {
   }, [clickedPost])
   const list = () => (
     <Box
-      sx={{ width: { xs: "100vw", md: "90vw" }, height: "100vh", overflowX: "hidden", overflowY:{md:'hidden', sm:'scroll'}, backgroundColor: "whitesmoke" }}
+      sx={{ width: { xs: "100vw", md: "90vw" }, height: "100vh", overflowX: "hidden", overflowY: { md: 'hidden', sm: 'scroll' }, backgroundColor: "whitesmoke" }}
       role="presentation"
     >
       <Grid container spacing={2} sx={{ flexDirection: { xs: "column", md: "row" }, boxSizing: "border-box", color: "whitesmoke" }}>
-        <Grid item sm={11} md={8} sx={{ height: {md:"100vh", xs:'auto'}, overflow: "hidden", display: "flex", justifyContent: "flex-start", flexDirection: "column" }}>
+        <Grid item sm={11} md={8} sx={{ height: { md: "100vh", xs: 'auto' }, overflow: "hidden", display: "flex", justifyContent: "flex-start", flexDirection: "column" }}>
           <Grid item sm={12} sx={{ display: "flex", justifyContent: "space-around", alignItems: "center", boxSizing: "border-box", maxHeight: "50px", backgroundColor: "lightblue" }}>
             <Button onClick={toggleDrawer(false)} sx={{ margin: 2, height: "40px" }}>
               Back
@@ -87,29 +89,29 @@ export default function DrawerTemplate(props) {
               <img src={fetchedPost ? fetchedPost.img.url : ''} alt="Story" style={{ width: "auto", height: "auto", maxHeight: "500px", maxWidth: "95%", borderRadius: "10px" }} />
             </Box>
             {
-              fetchedPost && fetchedPost.postType=='Event'
-              ?
-              <>
-                <Box sx={{ width: { xs: "100%", md: "70%", lg: "60%" },borderRadius:"10px", backgroundColor:"white",justifyContent:"space-around", display: "flex", flexDirection: "row",alignItems:"flex-start", alignContent:"center", margin: "20px 20px", color: "black" }}>
-                    <Box sx={{display:"flex", alignItems:"center"}}>
-                      <Typography sx={{border:"2px solid grey",borderRadius:"10px", display:"inline-block", width:'fit-content', padding:"15px", fontWeight:'800'}}>{fetchedPost ? eventDate.getDate() : ''}</Typography>
-                      <Box sx={{display:"flex", flexDirection:"column", alignItems:"flex-start", margin:"2px 10px"}}>
-                        <Typography sx={{display:"flex"}}>{fetchedPost ? eventDate.toLocaleDateString('en-US', { weekday: 'long'}) : ''}</Typography>
-                        <Typography sx={{display:"flex"}}>{fetchedPost ? eventDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : ''}</Typography>
+              fetchedPost && fetchedPost.postType == 'Event'
+                ?
+                <>
+                  <Box sx={{ width: { xs: "100%", md: "70%", lg: "60%" }, borderRadius: "10px", backgroundColor: "white", justifyContent: "space-around", display: "flex", flexDirection: "row", alignItems: "flex-start", alignContent: "center", margin: "20px 20px", color: "black" }}>
+                    <Box sx={{ display: "flex", alignItems: "center" }}>
+                      <Typography sx={{ border: "2px solid grey", borderRadius: "10px", display: "inline-block", width: 'fit-content', padding: "15px", fontWeight: '800' }}>{fetchedPost ? eventDate.getDate() : ''}</Typography>
+                      <Box sx={{ display: "flex", flexDirection: "column", alignItems: "flex-start", margin: "2px 10px" }}>
+                        <Typography sx={{ display: "flex" }}>{fetchedPost ? eventDate.toLocaleDateString('en-US', { weekday: 'long' }) : ''}</Typography>
+                        <Typography sx={{ display: "flex" }}>{fetchedPost ? eventDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : ''}</Typography>
                       </Box>
                     </Box>
-                    <Box sx={{display:"flex", alignItems:"center"}}>
-                      <Typography sx={{display:"flex", margin:"2px 10px"}}>Starts At </Typography>
-                      <Typography  sx={{border:"2px solid grey",borderRadius:"10px", display:"inline-block", width:'fit-content', padding:"15px 10px", fontWeight:'800'}}>{fetchedPost ? eventTime.toLocaleTimeString('en-US', { hour: 'numeric', hour12: true }) : null }</Typography>
+                    <Box sx={{ display: "flex", alignItems: "center" }}>
+                      <Typography sx={{ display: "flex", margin: "2px 10px" }}>Starts At </Typography>
+                      <Typography sx={{ border: "2px solid grey", borderRadius: "10px", display: "inline-block", width: 'fit-content', padding: "15px 10px", fontWeight: '800' }}>{fetchedPost ? eventTime.toLocaleTimeString('en-US', { hour: 'numeric', hour12: true }) : null}</Typography>
                     </Box>
-                </Box>
-                <Box sx={{ width: { xs: "100%", md: "70%", lg: "60%" }, display: "flex", flexDirection: "row", justifyContent:"center", color: "black" }}>
-                  <Typography variant='h5' sx={{display:"flex"}}>{fetchedPost ? fetchedPost.heading : null}</Typography>
-                </Box>
-              
-              </>
-              :
-              null
+                  </Box>
+                  <Box sx={{ width: { xs: "100%", md: "70%", lg: "60%" }, display: "flex", flexDirection: "row", justifyContent: "center", color: "black" }}>
+                    <Typography variant='h5' sx={{ display: "flex" }}>{fetchedPost ? fetchedPost.heading : null}</Typography>
+                  </Box>
+
+                </>
+                :
+                null
             }
             <Box sx={{ width: { xs: "100%", md: "70%", lg: "60%" }, display: "flex", flexDirection: "column", justifyContent: "flex-start", textAlign: "center", margin: "20px 20px", color: "black" }}>
               <Typography paragraph>{fetchedPost ? fetchedPost.data : ''}</Typography>
@@ -119,103 +121,106 @@ export default function DrawerTemplate(props) {
         {
           fetchedPost && fetchedPost.postType == 'Post'
             ?
-            <Grid item sm={11} md={4} sx={{ display: "flex", flexDirection: "column", height:{xs: "60vh",md: "100vh"}, overflow: "hidden", backgroundColor: "rgba(30, 31,33, 1)", borderTopLeftRadius: "10", overflowY: "scroll" }}>
+            <Grid item sm={11} md={4} sx={{ display: "flex", flexDirection: "column", height: { xs: "60vh", md: "100vh" }, overflow: "hidden", backgroundColor: "rgba(30, 31,33, 1)", borderTopLeftRadius: "10", overflowY: "scroll" }}>
               <Box sx={{ padding: "20px", flex: 1 }}>
                 <h1>Comments :</h1>
                 <List>
                   {
                     fetchedPost && postComments
                       ?
-                      postComments.map((comment, key) => {
-                        const readOnly = readOnlyStates[comment._id]
-                                        return (
-                                            <>
-                                                <ListItem alignItems="flex-start" id={comment._id}>
-                                                    <ListItemAvatar >
-                                                        <Avatar alt="Remy Sharp" sx={{ width: 34, height: 34 }} src="https://mui.com/static/images/avatar/3.jpg" />
-                                                    </ListItemAvatar>
-                                                    <ListItemText
-                                                        primary={comment.user ? comment.user.name : 'guest'}
-                                                        secondary={
-                                                            <React.Fragment>
-
-                                                                <Box id='editComment' >
-                                                                    <TextField
-                                                                        id={comment._id + "_textField"}
-                                                                        multiline
-                                                                        maxRows={6}
-                                                                        variant="standard"
-                                                                        InputProps={{
-                                                                            readOnly: readOnly,
-                                                                        }}
-                                                                        value={readOnly ? comment.data : updatedCommentData}
-                                                                        onChange={(e) => setUpdatedCommentData(e.target.value)}
-                                                                        sx={{
-                                                                            width: "100%",
-                                                                            '& .MuiInput-underline:before': {
-                                                                                borderBottom: 'none',
-                                                                            },
-                                                                            '& .MuiInput-underline:hover:before': {
-                                                                                borderBottom: 'none',
-                                                                            },
-                                                                            '& .MuiInput-underline:after': {
-                                                                                borderBottom: 'none',
-                                                                            },
-                                                                            '& .MuiInput-underline :hover': {
-                                                                                borderBottom: 'none'
-                                                                            }
-                                                                        }}
-                                                                    />
-                                                                    <Box sx={{
-                                                                        display: readOnlyStates[comment._id] ? 'none' : 'flex',
-                                                                        justifyContent: 'space-between', textTransform: 'lowercase',
-                                                                        borderTop:"1px solid black"
-                                                                       }}>
-                                                                    <Button size="small"
-                                                                        onClick={(event) => {
-                                                                          handleReadOnlyStates(comment._id, true)
-                                                                          setUpdatedCommentData("");
-                                                                        }}
-                                                                    >
-                                                                        cancel
-                                                                    </Button>
-                                                                    <Button size="small" 
-                                                                        onClick={(event) => {
-                                                                            event.preventDefault();
-                                                                            handleEditCommentSubmit(comment._id, setPostComments)
-                                                                        }} >
-                                                                        edit
-                                                                    </Button>
-                                                                    </Box>
-                                                                </Box>
-
-                                                            </React.Fragment>
-                                                        }
-                                                    />
-
-                                                    {/* to Edit the comments */}
-                                                    {
-                                                      (comment.user._id.toString() == user._id.toString()) 
-                                                            && 
-                                                        readOnlyStates[comment._id] 
-                                                       ?
-                                                        <MenuPopper commentId={comment._id}
-                                                                    handleReadOnlyStates={handleReadOnlyStates}
-                                                                    handleCommentDelete={handleCommentDelete} 
-                                                                    setPostComments={setPostComments}  
-                                                                    setUpdatedCommentData={setUpdatedCommentData}
-                                                                    commentData={comment.data}
-                                                                    postId={fetchedPost._id} 
-                                                        /> 
-                                                       :
-                                                       null
-                                                     }
-
-                                                </ListItem>
-
-                                                <Divider variant="inset" component="li" />
-                                            </>)
+                      postComments.map((comment) => {
+                        const readOnly = readOnlyStates[comment._id];
+                        return (
+                          <Box sx={{ display: "flex", flexDirection: 'column' }} key={comment._id} id={comment._id}>
+                            <ListItem alignItems="flex-start">
+                              <ListItemAvatar>
+                                <Avatar alt="Remy Sharp" sx={{ width: 34, height: 34 }} src="https://mui.com/static/images/avatar/3.jpg" />
+                              </ListItemAvatar>
+                              
+                              {/* Replace ListItemText with Box */}
+                              <Box sx={{ flexGrow: 1 }}>
+                                <Typography variant="body1">
+                                  {comment.user ? comment.user.name : 'guest'}
+                                </Typography>
+                                
+                                  <TextField
+                                    id={comment._id + "_textField"}
+                                    multiline
+                                    maxRows={6}
+                                    variant="standard"
+                                    InputProps={{
+                                      readOnly: readOnly,
+                                    }}
+                                    value={readOnly ? comment.data : updatedCommentData}
+                                    onChange={(e) => setUpdatedCommentData(e.target.value)}
+                                    sx={{
+                                      width: "100%",
+                                      '& .MuiInput-underline:before': {
+                                        borderBottom: 'none',
+                                      },
+                                      '& .MuiInput-underline:hover:before': {
+                                        borderBottom: 'none',
+                                      },
+                                      '& .MuiInput-underline:after': {
+                                        borderBottom: 'none',
+                                      },
+                                      '& .MuiInput-underline:hover': {
+                                        borderBottom: 'none'
+                                      }
+                                    }}
+                                  />
+                      
+                                <ListItemSecondaryAction
+                                  sx={{
+                                    position: 'absolute',
+                                    right: '16px',
+                                    top: '100%',
+                                    display: readOnlyStates[comment._id] ? 'none' : 'flex',
+                                    justifyContent: 'space-between',
+                                    textTransform: 'lowercase',
+                                    borderTop: "1px solid black"
+                                  }}
+                                >
+                                  <Button size="small"
+                                    onClick={() => {
+                                      handleReadOnlyStates(comment._id, true);
+                                      setUpdatedCommentData("");
+                                    }}
+                                  >
+                                    cancel
+                                  </Button>
+                                  <Button size="small"
+                                    onClick={(event) => {
+                                      event.preventDefault();
+                                      handleEditCommentSubmit(comment._id, setPostComments);
+                                    }}
+                                  >
+                                    edit
+                                  </Button>
+                                </ListItemSecondaryAction>
+                              </Box>
+                      
+                              {/* to Edit the comments */}
+                              {
+                                (comment.user._id.toString() === user._id.toString()) &&
+                                readOnlyStates[comment._id] ? (
+                                  <MenuPopper commentId={comment._id}
+                                    handleReadOnlyStates={handleReadOnlyStates}
+                                    handleCommentDelete={handleCommentDelete}
+                                    setPostComments={setPostComments}
+                                    setUpdatedCommentData={setUpdatedCommentData}
+                                    commentData={comment.data}
+                                    postId={fetchedPost._id}
+                                  />
+                                ) : null
+                              }
+                      
+                            </ListItem>
+                            <Divider variant="inset" component="li" />
+                          </Box>
+                        );
                       })
+                      
                       :
                       null
                   }
@@ -223,14 +228,15 @@ export default function DrawerTemplate(props) {
               </Box>
               <Box sx={{ position: "sticky", bottom: "0px", backgroundColor: "rgba(30, 31,33, 1)" }} >
                 <form action="comment/create-comment" method="post"
-                  onClick={(e)=>{
+                  onClick={(e) => {
                     e.preventDefault();
                     handleCommentSubmit(fetchedPost._id, setPostComments)
                   }}
-                  style={{ display: "flex", alignItems: "flex-end",
-                          flexWrap: "nowrap", justifyContent: "center",
-                          paddingBottom: "10px", backgroundColor: "rgba(30, 31,33, 1)"
-                        }}>
+                  style={{
+                    display: "flex", alignItems: "flex-end",
+                    flexWrap: "nowrap", justifyContent: "center",
+                    paddingBottom: "10px", backgroundColor: "rgba(30, 31,33, 1)"
+                  }}>
                   <TextField
                     autoFocus
                     required
@@ -268,8 +274,7 @@ export default function DrawerTemplate(props) {
                       ?
                       fetchedPost.interestedUsers.map((interestedUser, key) => {
                         return (
-                          <>
-                            <ListItem alignItems="flex-start" id={interestedUser._id} sx={{ border: "1px solid whitesmoke", display: "flex", alignItems: "center" }}>
+                            <ListItem alignItems="flex-start" key={interestedUser._id} id={interestedUser._id} sx={{ border: "1px solid whitesmoke", display: "flex", alignItems: "center" }}>
                               <ListItemAvatar >
                                 <Avatar alt="Remy Sharp" sx={{ width: 34, height: 34 }} src="https://mui.com/static/images/avatar/3.jpg" />
                               </ListItemAvatar>
@@ -277,7 +282,7 @@ export default function DrawerTemplate(props) {
                                 primary={interestedUser.name ? interestedUser.name : 'guest'}
                               />
                             </ListItem>
-                          </>)
+                          )
                       })
                       :
                       null
