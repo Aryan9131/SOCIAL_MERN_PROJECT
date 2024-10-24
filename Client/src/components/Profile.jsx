@@ -234,7 +234,7 @@ export default function Profile({ handleCardClick, open, toggleDrawer, clickedPo
                     >
                       <Avatar
                         alt="Remy Sharp"
-                        src={thisUser.avatar ? thisUser.avatar.url : "https://mui.com/static/images/avatar/2.jpg"}
+                        src={friend.userId.avatar ? friend.userId.avatar.url : "https://mui.com/static/images/avatar/2.jpg"}
                         variant="rounded"
                         sx={{ borderRadius: "15px", height: "70px", width: "70px" }}
                       />

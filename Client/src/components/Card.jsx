@@ -41,11 +41,19 @@ export default function GeneralCard(props) {
               'Authorization': `Bearer ${token}`
             }
           });
-          const removeLikeData= await removeLikeResponse.json();
-          post.isLiked=false;
-          e.target.style.color= 'blueviolet'
-          setLikeCount((prev)=>prev-1)
-          console.log("removeLikeData : " + removeLikeData)
+          if(removeLikeResponse.status==401 || removeLikeResponse.status==204){
+            console.log('this is running to handle unautherized ***')
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            navigate('/sign-in')
+          }else{
+            const removeLikeData= await removeLikeResponse.json();
+            post.isLiked=false;
+            e.target.style.color= 'blueviolet'
+            setLikeCount((prev)=>prev-1)
+            console.log("removeLikeData : " + removeLikeData)
+          }
+          
       }else{
           const addLikeResponse=await fetch(`${import.meta.env.VITE_BASE_URL}/post/add-post-like/${post._id}`,{
             method: "Get",
@@ -54,11 +62,19 @@ export default function GeneralCard(props) {
               'Authorization': `Bearer ${token}`
             }
           });
-          const addLikeData= await addLikeResponse.json();
-          post.isLiked=true;
-           e.target.style.color= 'red'
-           console.log("addLikeData : "+addLikeData)
-           setLikeCount((prev)=>prev+1)
+          if(removeLikeResponse.status==401 || removeLikeResponse.status==204){
+            console.log('this is running to handle unautherized ***')
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            navigate('/sign-in')
+          }else{
+            const addLikeData= await addLikeResponse.json();
+            post.isLiked=true;
+            e.target.style.color= 'red'
+            console.log("addLikeData : "+addLikeData)
+            setLikeCount((prev)=>prev+1)
+          }
+          
       }
     } catch (error) {
         console.log("Error while adding/removing like on Post : "+error);
@@ -68,7 +84,7 @@ export default function GeneralCard(props) {
     <Card sx={{ maxWidth: 300, minWidth: { sx: 260, md: 300 }, marginBottom: "15px", boxShadow: '0', border: "0px", borderRadius: "15px", padding: "10px 20px", boxSizing: "border-box" }}  >
       <CardHeader
         avatar={
-          <Avatar alt="Remy Sharp" src={user.avatar ? user.avatar.url : "https://mui.com/static/images/avatar/2.jpg"} variant="rounded" sx={{ cursor:"pointer", borderRadius: "15px" }} onClick={()=>navigate(`profile/${post.user._id}`)} />
+          <Avatar alt="Remy Sharp" src={post.user.avatar ? post.user.avatar.url : "https://mui.com/static/images/avatar/2.jpg"} variant="rounded" sx={{ cursor:"pointer", borderRadius: "15px" }} onClick={()=>navigate(`profile/${post.user._id}`)} />
         }
         action={
           deletePost && (post.user._id.toString()=== user_id.toString()) ?

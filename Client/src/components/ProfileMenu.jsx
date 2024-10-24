@@ -78,7 +78,7 @@ export default function ProfileMenu() {
                                   handleClose()
                                 }}>
                 <ListItemIcon>
-                    <Avatar sx={{ width: 24, height: 24 }} />
+                    <Avatar src={user.avatar?.url} sx={{ width: 24, height: 24 }} />
                 </ListItemIcon>Profile
         </MenuItem>
         <MenuItem onClick={handleLogOut}>

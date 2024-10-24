@@ -146,7 +146,7 @@ export default function ResponsiveDialog({ createPost }) {
         <React.Fragment>
             <Button aria-label="share" variant="contained" 
                     onClick={handleClickOpen}
-                    sx={{marginLeft:"5px", display: "flex", alignItems: "center" }}
+                    sx={{marginLeft:"5px", display: "flex", alignItems: "center", width:'50%' }}
             >
                share <KeyboardArrowRightIcon  aria-label="arrow right" aria-hidden="false"/>
             </Button>

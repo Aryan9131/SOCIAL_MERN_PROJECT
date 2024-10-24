@@ -13,6 +13,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import getSocket from "../utils/socketManager";
 import { useSelector, useDispatch } from 'react-redux';
 import { addStory } from '../features/conversationSlice';
+import { addNotification } from '../features/socketSlice';
 
 export default function StoryDialog() {
   const [open, setOpen] = React.useState(false);
@@ -41,33 +42,35 @@ export default function StoryDialog() {
   const handleStorySubmit = async () => {
     try {
       let cloudinaryData = undefined;
-      if (mediaUrl) {
-        const data = new FormData();
-        data.append('file', imgFile);
-        data.append('upload_preset', 'Social-App');
-        data.append('cloud_name', 'anayak');
-        const cloudinaryResponse = await fetch('https://api.cloudinary.com/v1_1/anayak/image/upload', {
-          method: 'POST',
-          body: data
+      if (storyCaption && mediaUrl) {
+          const data = new FormData();
+          data.append('file', imgFile);
+          data.append('upload_preset', 'Social-App');
+          data.append('cloud_name', 'anayak');
+          const cloudinaryResponse = await fetch('https://api.cloudinary.com/v1_1/anayak/image/upload', {
+            method: 'POST',
+            body: data
+          });
+          if (!cloudinaryResponse.ok) {
+            throw new Error('Failed to upload image');
+          }
+        const cloudinaryData = await cloudinaryResponse.json();
+        const storyObject = {
+          img: {
+            url: mediaUrl ? cloudinaryData.url : '',
+            id: mediaUrl ? cloudinaryData.public_id : ''
+          },
+          data: storyCaption,
+          userId: user._id.toString()
+        };
+        socket.emit('createStory', storyObject, (data) => {
+          console.log('create story event clicked');
+          dispatch(addStory({ story: data.story }));
         });
-        if (!cloudinaryResponse.ok) {
-          throw new Error('Failed to upload image');
-        }
-        cloudinaryData = await cloudinaryResponse.json();
+        handleClose();
+      }else{
+        dispatch(addNotification({message: `Please add ${storyCaption ? 'Image' : 'Caption'} to Story !`}))
       }
-      const storyObject = {
-        img: {
-          url: mediaUrl ? cloudinaryData.url : '',
-          id: mediaUrl ? cloudinaryData.public_id : ''
-        },
-        data: storyCaption,
-        userId: user._id.toString()
-      };
-      socket.emit('createStory', storyObject, (data) => {
-        console.log('create story event clicked');
-        dispatch(addStory({ story: data.story }));
-      });
-      handleClose();
     } catch (error) {
       console.log('Error while posting Story : ' + error);
     }
@@ -119,7 +122,7 @@ export default function StoryDialog() {
               hidden
               onChange={handleMediaChange}
             />
-            <CameraAltIcon sx={{ height: '15px', width: '15px' }}  />
+            <CameraAltIcon sx={{ height: '15px', width: '15px' }} />
           </IconButton>
 
           <TextField

@@ -11,28 +11,27 @@ import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
 import { useSelector, useDispatch } from "react-redux"
 import useImgPreview from '../hooks/handleImgPreview'
 import { setUser } from '../features/userSlice';
-export default function FormDialog() {
+export default function FormDialog({open, setOpen}) {
     const {user}=useSelector((state)=>state.user);
-    const [open, setOpen] = React.useState(false);
+   
     const [imgFile, setImgFile] = React.useState(null);
-    const { handleMediaChange, mediaUrl} = useImgPreview(user.avatar ? user.avatar : null, setImgFile )
+    const { handleMediaChange, mediaUrl,clearMedia} = useImgPreview(user.avatar ? user.avatar : null, setImgFile )
 
     const imgInputRef = React.useRef(null);
     const [userName, setUserName] = React.useState( user ? user.name : undefined);
     const [userAbout, setUserAbout] = React.useState(user ? user.about : undefined);
-    const [userAvatar, setUserAvatar] = React.useState(user && user.avatar ? user.avatar.url : undefined);
+    const [userAvatar, setUserAvatar] = React.useState((user && user.avatar) ? user.avatar.url : "");
     const [userEmail, setUserEmail] = React.useState(user ? user.email : undefined);
     const [userPassword, setUserPassword] = React.useState(user ? user.password : undefined);
     const token = localStorage.getItem('token'); // Make sure 'token' is the string key
 
     const dispatch=useDispatch()
 
-    const handleClickOpen = () => {
-        setOpen(true);
-    };
-
     const handleClose = () => {
+        console.log('edit dialog --> false')
         setOpen(false);
+        clearMedia();
+       
     };
     const handleSubmit=async ()=>{
         let updatedUserProfile=undefined;
@@ -89,14 +88,16 @@ export default function FormDialog() {
         handleClose();
     }
     React.useEffect(()=>{
-        setUserAvatar
+        setUserAvatar(undefined)
         console.log("selected avatar --> "+JSON.stringify(userAvatar));
     }, [mediaUrl])
+    React.useEffect(()=>{
+        setUserAvatar((user && user.avatar) ? user.avatar.url : undefined)
+        console.log("selected avatar --> "+JSON.stringify(userAvatar));
+    }, [])
+   
     return (
         <React.Fragment>
-            <Button variant="contained" onClick={handleClickOpen} sx={{ boxShadow: "none", backgroundColor: "rgba(82, 214,105, 1)", padding: "13px 28px", borderRadius: "12px" }}>
-                Edit Profile
-            </Button>
             <Dialog
                 open={open}
                 onClose={handleClose}
@@ -109,6 +110,7 @@ export default function FormDialog() {
                                 position: "relative", // Make the Box relative to position elements inside
                                 width: "fit-content",
                                 '&:hover .camera-icon': {
+                                    color:"grey",
                                     opacity: 1, // Show the camera icon on hover
                                 },
                                 '&:hover::before': {
@@ -131,7 +133,7 @@ export default function FormDialog() {
                             }}
                             onClick={() => imgInputRef.current.click()}
                         >
-                            <Avatar alt="Remy Sharp" src={mediaUrl ? mediaUrl : (userAvatar ? userAvatar : "")} variant="rounded" 
+                            <Avatar alt="Profile" src={userAvatar ? userAvatar+"" : mediaUrl ? mediaUrl+"" : ""} variant="rounded" 
                                 sx={{
                                     cursor: "pointer",
                                     borderRadius: "30px",

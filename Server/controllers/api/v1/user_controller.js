@@ -268,7 +268,7 @@ module.exports.getProfile =async function(req, res){
 module.exports.updateProfile =async function(req, res){
     try {
         console.log(" data for update profile --> "+JSON.stringify(req.body));
-        const updatedUser=await User.findByIdAndUpdate(req.user._id,req.body);
+        const updatedUser=await User.findByIdAndUpdate(req.user._id,req.body, { new: true });
         return res.status(200).json({
             user:updatedUser,
             message:"Profile updated successfully !",

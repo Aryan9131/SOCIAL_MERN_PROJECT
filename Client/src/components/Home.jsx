@@ -9,17 +9,18 @@ import PostCard from './PostCard';
 import FeaturedStories from './FeaturedStories';
 import { NavLink } from "react-router-dom";
 import DrawerTemplate from './DrawerTemplate';
-import { useSelector , useDispatch} from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { useState, useEffect } from 'react';
 import StoryDialog from './StoryDialog';
-import {fetchStories} from '../features/conversationSlice';
+import { fetchStories } from '../features/conversationSlice';
 import getSocket from "../utils/socketManager"
 import StoryDrawer from './StoryDrawer'
 import { addNotification } from '../features/socketSlice';
+import { useNavigate } from 'react-router-dom';
 
 export default function Home({ handleCardClick, open, toggleDrawer, clickedPost }) {
   let user = useSelector((state) => state.user).user;
-  const {notifications} = useSelector((state)=>state.socket)
+  const { notifications } = useSelector((state) => state.socket)
   let user_id = user._id;
   const token = localStorage.getItem('token'); // Make sure 'token' is the string key
   const [commentData, setCommentData] = React.useState("");
@@ -27,26 +28,27 @@ export default function Home({ handleCardClick, open, toggleDrawer, clickedPost 
   const [userPosts, setUserPosts] = useState([]);
   const [allPosts, setAllPosts] = useState([]);
   const [socket, setSocket] = React.useState(undefined);
-  const [index, setIndex]=React.useState(undefined)
-  const {stories} =useSelector((state)=>state.conversations.direct_chat);
+  const [index, setIndex] = React.useState(undefined)
+  const { stories } = useSelector((state) => state.conversations.direct_chat);
   const dispatch = useDispatch();
+  let navigate = useNavigate();
   useEffect(() => {
     setSocket(getSocket())
-    if (user) {    
+    if (user) {
       fetchPosts();
     }
   }, [user, socket]);
-  useEffect(()=>{
-    if(socket){
+  useEffect(() => {
+    if (socket) {
       fetchAllStories();
     }
-  },[socket])
+  }, [socket])
 
-  const fetchAllStories =()=>{
-    if(socket){
-      socket.emit('fetchStories', (storydata)=>{
-         console.log('Stories get --> '+storydata.stories)
-         const fetchedStoriesWithIsLikedStatus =storydata.stories.map((stry) => {
+  const fetchAllStories = () => {
+    if (socket) {
+      socket.emit('fetchStories', (storydata) => {
+        console.log('Stories get --> ' + storydata.stories)
+        const fetchedStoriesWithIsLikedStatus = storydata.stories.map((stry) => {
           return (
             {
               ...stry,
@@ -54,8 +56,8 @@ export default function Home({ handleCardClick, open, toggleDrawer, clickedPost 
             }
           )
         })
-         dispatch(fetchStories({stories : fetchedStoriesWithIsLikedStatus}));
-       })
+        dispatch(fetchStories({ stories: fetchedStoriesWithIsLikedStatus }));
+      })
     }
   }
   const fetchPosts = async () => {
@@ -88,7 +90,7 @@ export default function Home({ handleCardClick, open, toggleDrawer, clickedPost 
     }
   };
   const handleCreatePost = (newPost) => {
-    dispatch(addNotification({message : 'post created sucessfully !'}));
+    dispatch(addNotification({ message: 'post created sucessfully !' }));
     setUserPosts((prev) => [newPost, ...prev]);
   }
 
@@ -103,16 +105,23 @@ export default function Home({ handleCardClick, open, toggleDrawer, clickedPost 
         body: JSON.stringify({ imgId: imgId })
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to delete post');
+      if (response.status == 401 || response.status == 204) {
+        console.log('this is running to handle unautherized ***')
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        navigate('/sign-in')
+      } else {
+        if (!response.ok) {
+          throw new Error('Failed to delete post');
+        }
+        const data = await response.json();
+        if (data.status === 200) {
+          setUserPosts((prevPosts) => prevPosts.filter(post => post._id !== postId));
+          dispatch(addNotification({ message: 'post deleted sucessfully !' }));
+          console.log("post deleted successfully !")
+        }
       }
 
-      const data = await response.json();
-      if (data.status === 200) {
-        setUserPosts((prevPosts) => prevPosts.filter(post => post._id !== postId));
-        dispatch(addNotification({message : 'post deleted sucessfully !'}));
-        console.log("post deleted successfully !")
-      }
     } catch (error) {
       console.error('Error deleting post:', error);
     }
@@ -130,23 +139,31 @@ export default function Home({ handleCardClick, open, toggleDrawer, clickedPost 
             data: updatedCommentData,
           })
         })
-        const updatedCommentResponseData = await updatedCommentResponse.json();
-        console.log("updatedCommentData--> " + JSON.stringify(updatedCommentResponseData))
-        if (updatedCommentResponseData.status == 'ok') {
-          setPostComments((prev) => {
-            return prev.map((cmnt) => {
-              if (cmnt._id.toString() == commentId.toString()) {
-                cmnt.data = updatedCommentData;
-                return cmnt;
-              } else {
-                return cmnt;
-              }
-            })
-          })
+        if (updatedCommentResponse.status == 401 || updatedCommentResponse.status == 204) {
+          console.log('this is running to handle unautherized ***')
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          navigate('/sign-in')
         } else {
-          console.log("can't update comment !")
+          const updatedCommentResponseData = await updatedCommentResponse.json();
+          console.log("updatedCommentData--> " + JSON.stringify(updatedCommentResponseData))
+          if (updatedCommentResponseData.status == 'ok') {
+            setPostComments((prev) => {
+              return prev.map((cmnt) => {
+                if (cmnt._id.toString() == commentId.toString()) {
+                  cmnt.data = updatedCommentData;
+                  return cmnt;
+                } else {
+                  return cmnt;
+                }
+              })
+            })
+          } else {
+            console.log("can't update comment !")
+          }
         }
       }
+
     } catch (error) {
       console.log("Error while updating Comment : " + error)
     }
@@ -166,13 +183,21 @@ export default function Home({ handleCardClick, open, toggleDrawer, clickedPost 
             user: user._id
           })
         })
-        if (!createCommentResponse.ok) {
-          throw new Error('Failed to create post');
+        if (createCommentResponse.status == 401 || createCommentResponse.status == 204) {
+          console.log('this is running to handle unautherized ***')
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          navigate('/sign-in')
+        }else{
+          if (!createCommentResponse.ok) {
+            throw new Error('Failed to create post');
+          }
+          const createCommentResponseData = await createCommentResponse.json();
+          setPostComments((prev) => [...prev, createCommentResponseData.comment])
+          setCommentData("");
+          console.log("createCommentResponseData ->" + JSON.stringify(createCommentResponseData.comment))
         }
-        const createCommentResponseData = await createCommentResponse.json();
-        setPostComments((prev) => [...prev, createCommentResponseData.comment])
-        setCommentData("");
-        console.log("createCommentResponseData ->" + JSON.stringify(createCommentResponseData.comment))
+        
       }
     } catch (error) {
       console.log("Error while creating Comment : " + error)
@@ -191,22 +216,30 @@ export default function Home({ handleCardClick, open, toggleDrawer, clickedPost 
           postId: postId
         })
       })
-      if (!deleteCommentResponse.ok) {
-        throw new Error('Failed to delete post');
+      if (deleteCommentResponse.status == 401 || deleteCommentResponse.status == 204) {
+        console.log('this is running to handle unautherized ***')
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        navigate('/sign-in')
+      }else{
+        if (!deleteCommentResponse.ok) {
+          throw new Error('Failed to delete post');
+        }
+        const deleteCommentResponseData = await deleteCommentResponse.json();
+        setPostComments((prev) => {
+          return (
+            prev.filter((cmnt) => cmnt._id.toString() != commentId)
+          )
+        })
+        console.log("deleteCommentResponseData ->" + JSON.stringify(deleteCommentResponseData))
       }
-      const deleteCommentResponseData = await deleteCommentResponse.json();
-      setPostComments((prev) => {
-        return (
-          prev.filter((cmnt) => cmnt._id.toString() != commentId)
-        )
-      })
-      console.log("deleteCommentResponseData ->" + JSON.stringify(deleteCommentResponseData))
+      
     } catch (error) {
       console.log("Error while deleting Comment : " + error)
     }
   }
   const [storyDrawerOpen, setStoryDrawerOpen] = React.useState(false);
-  const [clickedStory, setClickedStory]=React.useState(undefined);
+  const [clickedStory, setClickedStory] = React.useState(undefined);
   const toggleStoryDrawer = (open) => (event) => {
     if (event && event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
       return;
@@ -217,8 +250,8 @@ export default function Home({ handleCardClick, open, toggleDrawer, clickedPost 
   };
 
   const handleStoryClick = (story, index) => {
-    console.log("index of story "+index)
-    console.log("story changed -->"+JSON.stringify(story))
+    console.log("index of story " + index)
+    console.log("story changed -->" + JSON.stringify(story))
     setClickedStory(story);
     setIndex(index);
     console.log("Card clicked"); // Debug log
@@ -231,38 +264,38 @@ export default function Home({ handleCardClick, open, toggleDrawer, clickedPost 
           <h4>Stories: </h4>
           <h5><NavLink to="/stories">See All</NavLink></h5>
         </Grid>
-        <Grid item xs={12} sm={12} id="featuredStories" sx={{ marginLeft:"10px", width: "100vw", display: "flex", overflow: "hidden" }}>
-          <Box sx={{ 
-                    width: "55px",
-                    borderRadius: "15px",
-                    backgroundColor: "white",
-                    padding:"1px 10px",
-                    textAlign: "center",
-                    display:"flex",
-                    flexDirection:"column",
-                    justifyContent:"center"
-                   }}>
-             <StoryDialog/>
-            <Typography sx={{fontWeight:"700", fontSize:".6rem"}}> Add Story</Typography>
+        <Grid item xs={12} sm={12} id="featuredStories" sx={{ marginLeft: "10px", width: "100vw", display: "flex", overflow: "hidden" }}>
+          <Box sx={{
+            width: "55px",
+            borderRadius: "15px",
+            backgroundColor: "white",
+            padding: "1px 10px",
+            textAlign: "center",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center"
+          }}>
+            <StoryDialog />
+            <Typography sx={{ fontWeight: "700", fontSize: ".6rem" }}> Add Story</Typography>
           </Box>
-          <Box sx={{ display: "flex", overflowX: "scroll" ,'&::-webkit-scrollbar' :{display:"none"}}}>
+          <Box sx={{ display: "flex", overflowX: "scroll", '&::-webkit-scrollbar': { display: "none" } }}>
             {
               stories
-              ?
-              stories.map((story, index)=>{
+                ?
+                stories.map((story, index) => {
                   return (
-                    <FeaturedStories story={story} index={index} handleStoryClick={handleStoryClick}/>
+                    <FeaturedStories story={story} key={story._id} index={index} handleStoryClick={handleStoryClick} />
                   )
-              })
-              :
-              null
+                })
+                :
+                null
             }
             {
               clickedStory
-              ?
-              <StoryDrawer storyDrawerOpen={storyDrawerOpen} toggleStoryDrawer={toggleStoryDrawer} clickedStory={clickedStory} index={index} handleStoryClick={handleStoryClick} />
-              :
-              null
+                ?
+                <StoryDrawer storyDrawerOpen={storyDrawerOpen} toggleStoryDrawer={toggleStoryDrawer} clickedStory={clickedStory} index={index} handleStoryClick={handleStoryClick} />
+                :
+                null
             }
           </Box>
           {/* Repeat FeaturedStories with handleCardClick as necessary */}
@@ -272,7 +305,7 @@ export default function Home({ handleCardClick, open, toggleDrawer, clickedPost 
 
           {
             userPosts.map((post) => (
-              <Card  key={post._id} 
+              <Card key={post._id}
                 post={post} deletePost={handleDeletePost}
                 allPosts={userPosts} setPosts={setUserPosts}
                 commentData={commentData}
@@ -289,7 +322,7 @@ export default function Home({ handleCardClick, open, toggleDrawer, clickedPost 
         <Grid item xs={12} sm={6} md={8} id="rightContent">
           {
             allPosts.map((post) => (
-              <Card post={post} key={post._id} 
+              <Card post={post} key={post._id}
                 allPosts={allPosts} setPosts={setAllPosts}
                 commentData={commentData}
                 setCommentData={setCommentData}
@@ -303,23 +336,23 @@ export default function Home({ handleCardClick, open, toggleDrawer, clickedPost 
           }
         </Grid>
         {
-          clickedPost 
-          ?
-          <Grid item xs={8} sm={4} md={3} sx={{ display: "flex", justifyContent: "center" }}>
-          <DrawerTemplate open={open}
-            toggleDrawer={toggleDrawer}
-            clickedPost={clickedPost}
-            commentData={commentData}
-            setCommentData={setCommentData}
-            updatedCommentData={updatedCommentData}
-            setUpdatedCommentData={setUpdatedCommentData}
-            handleCommentSubmit={handleCommentSubmit}
-            handleCommentDelete={handleCommentDelete}
-            handleEditCommentSubmit={handleEditCommentSubmit}
-          />
-        </Grid>
-        :
-        null
+          clickedPost
+            ?
+            <Grid item xs={8} sm={4} md={3} sx={{ display: "flex", justifyContent: "center" }}>
+              <DrawerTemplate open={open}
+                toggleDrawer={toggleDrawer}
+                clickedPost={clickedPost}
+                commentData={commentData}
+                setCommentData={setCommentData}
+                updatedCommentData={updatedCommentData}
+                setUpdatedCommentData={setUpdatedCommentData}
+                handleCommentSubmit={handleCommentSubmit}
+                handleCommentDelete={handleCommentDelete}
+                handleEditCommentSubmit={handleEditCommentSubmit}
+              />
+            </Grid>
+            :
+            null
         }
       </Grid>
 
