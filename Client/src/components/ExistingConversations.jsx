@@ -4,6 +4,7 @@ import Grid from '@mui/material/Grid';
 import { useDispatch, useSelector } from "react-redux";
 import { selectConversation, setClickedConversationId, toggleShowChattingDetails } from "../features/conversationSlice";
 import { useState } from "react";
+import FilePresentIcon from '@mui/icons-material/FilePresent';
 const ExistingConversations = ({ type }) => {
     let user = useSelector((state) => state.user).user;
     let user_id = user._id;
@@ -33,8 +34,19 @@ const ExistingConversations = ({ type }) => {
                                         <p> {conversation.name}</p>
                                         <sub style={{ color: "grey", paddingRight:"10px",paddingLeft:"2px" }}>{conversation.time}</sub>
                                     </Box>
-                                    <Box sx={{ marginLeft: "30px", marginRight: "10px",color:'grey' }}>
-                                        <p>{conversation.msg}</p>
+                                    <Box sx={{ marginLeft: "30px", marginRight: "10px",color:'grey', display:"flex", alignItems:"center" }}>
+                                        
+                                        {
+                                            conversation.msg 
+                                            ?
+                                            <p>{conversation.msg}</p>
+                                            :
+                                            <>
+                                              <FilePresentIcon sx={{color:"#75db86"}}/>
+                                              <sub>file</sub>
+                                            </>
+                                        }
+                                         
                                     </Box>
                                 </Box>
                             </Box>

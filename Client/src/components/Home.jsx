@@ -289,7 +289,7 @@ export default function Home({ handleCardClick, open, toggleDrawer, clickedPost 
         <Grid item xs={12} sm={6} md={8} id="rightContent">
           {
             allPosts.map((post) => (
-              <Card post={post}
+              <Card post={post} key={post._id} 
                 allPosts={allPosts} setPosts={setAllPosts}
                 commentData={commentData}
                 setCommentData={setCommentData}

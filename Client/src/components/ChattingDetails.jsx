@@ -407,7 +407,12 @@ const ChattingDetails = function () {
                                 ?
                                 <img src={mediaFileValue ? mediaUrl : ""} width="100%" height="100%" alt="preview"  style={{ display: "block", marginLeft: "auto", marginRight: "auto" }} />
                                 :
-                                <h2>No Preview Available</h2>
+                                <Box sx={{display:"flex",flexDirection:"column", alignItems :"center"}}>
+                                   <h2>No Preview Available</h2>
+                                   <Divider sx={{ width: "100%" }} />
+                                   <br />
+                                   <sub>{mediaFileValue?.name}</sub>
+                                </Box>
                         }
                     </Box>
                 </Paper>
