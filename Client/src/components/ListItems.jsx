@@ -16,6 +16,7 @@ import socketSlice, { addNotification } from '../features/socketSlice';
 import { useEffect } from 'react';
 import getSocket from '../utils/socketManager';
 import ChatBubbleOutlineOutlinedIcon from '@mui/icons-material/ChatBubbleOutlineOutlined';
+import PendingIcon from '@mui/icons-material/Pending';
 
 const FriendList = ({ handleClose, friends, allGroups }) => {
     console.log("friends in friends list --> " + friends);
@@ -37,10 +38,18 @@ const FriendList = ({ handleClose, friends, allGroups }) => {
                 <ListItem
                     key={item._id} // Ensure each item has a unique key
                     secondaryAction={
-                        <Tooltip title="Chat" placement="right-start">
-                            <IconButton edge="end" aria-label="chat" onClick={() => handleChatIconClick(item.userId)} sx={{ color: "rgba(103, 107, 236, 1)" }}>
-                                <ChatBubbleOutlineOutlinedIcon />
-                            </IconButton>
+                        <Tooltip title={item.status=='pending' ? 'request not accepted yet' : 'chat'}  placement="right-start">
+                            {
+                                item.status == 'pending'
+                                    ?
+                                    <IconButton edge="end" aria-label="chat" sx={{color:'yellow'}}>
+                                        <PendingIcon  />
+                                    </IconButton>
+                                    :
+                                    <IconButton edge="end" aria-label="chat" onClick={() => handleChatIconClick(item.userId)} sx={{ color: "rgba(103, 107, 236, 1)" }}>
+                                        <ChatBubbleOutlineOutlinedIcon />
+                                    </IconButton>
+                            }
                         </Tooltip>
                     }
                 >
@@ -56,7 +65,7 @@ const FriendList = ({ handleClose, friends, allGroups }) => {
     );
 };
 
-const ExploreList = ({ handleAddFriend , friends}) => {
+const ExploreList = ({ handleAddFriend, friends }) => {
     let user = useSelector((state) => state.user).user;
     let user_id = user._id;
     const [allUsers, setAllUsers] = useState([]);
@@ -73,8 +82,8 @@ const ExploreList = ({ handleAddFriend , friends}) => {
     return (
         <>
             {allUsers.map((item) => {
-               const isFriendIndex = friends.findIndex(frnd => frnd.userId._id.toString() == item._id.toString());
-                if (isFriendIndex==-1) {
+                const isFriendIndex = friends.findIndex(frnd => frnd.userId._id.toString() == item._id.toString());
+                if (isFriendIndex == -1) {
                     return (
                         <ListItem
                             key={item._id} // Ensure each item has a unique key
@@ -128,8 +137,8 @@ const RequestsList = ({ handleAcceptRequest }) => {
                     key={item._id} // Ensure each item has a unique key
                     secondaryAction={
                         <Tooltip title="Accept" placement="right-start">
-                            <IconButton edge="end" aria-label="accept">
-                                <Button onClick={() => handleAcceptRequest(item._id)}>Accept</Button>
+                            <IconButton edge="end" aria-label="accept" sx={{ color: 'black' }} onClick={() => handleAcceptRequest(item._id, setAllRequests)}>
+                                <sub>accept</sub>
                             </IconButton>
                         </Tooltip>
                     }
@@ -168,7 +177,12 @@ const ListItems = ({ handleClose, listValues, allGroups, type, setAllFriends }) 
         })
     }
 
-    const handleAcceptRequest = async (request_id) => {
+    const handleAcceptRequest = async (request_id, setAllRequests) => {
+        let socket = getSocket();
+        socket.emit('request_accepted', {
+            request_id: request_id
+        })
+        setAllRequests((prev) =>prev.filter((req)=>req._id.toString()!=request_id.toString()));
         const AcceptFriendResponse = await fetch(`${import.meta.env.VITE_BASE_URL}/user/accept-friend-request`, {
             method: 'Post',
             headers: {
@@ -179,9 +193,12 @@ const ListItems = ({ handleClose, listValues, allGroups, type, setAllFriends }) 
         })
         const acceptFriendResponseData = await AcceptFriendResponse.json()
         console.log("Recieved Data after accept --> " + JSON.stringify(acceptFriendResponseData))
-
-
+        setAllFriends((prev) => [acceptFriendResponseData.data, ...prev])
     }
+    useEffect(()=>{
+          console.log('all ListValues --> '+JSON.stringify(listValues))
+    },[listValues])
+
     console.log("Socket outside -->" + getSocket());
     return (
         <List>

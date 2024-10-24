@@ -14,6 +14,7 @@ const app = express();
 const port = process.env.PORT || 8000;
 const server = createServer(app);
 const cron = require('node-cron');
+const FriendRequest = require('./models/FriendRequest');
 
 dotenv.config();
 
@@ -155,6 +156,15 @@ io.on('connection', async (socket) => {
             });
         }
         console.log("Emitted new_friend_request event to clients");
+    });
+    
+    socket.on('request_accepted', async (data)=>{
+        console.log("Received request_accepted event on server", data);
+        const request= await FriendRequest.findById(data.request_id);
+        const sender =await User.findById(request.sender);
+        socket.to(sender.socket_id).emit('request_accepted', {
+            message: "New Friend Request Accepted !"
+        });
     });
 
     socket.on('previous_conversations', async ({ user_id }, callback) => {

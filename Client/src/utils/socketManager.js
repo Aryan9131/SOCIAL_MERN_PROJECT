@@ -95,8 +95,10 @@ export const connectSocket = (user_id) => {
             const message = data.message;
             console.log("new_message --> "+JSON.stringify(message));
             // check if msg we got is from currently selected conversation
-            if (current_conversation?._id === data.conversation_id) {
-              store.dispatch(addNotification({message : "new Message "}));
+            if(!current_conversation || current_conversation?._id.toString()!=data.conversation_id.toString()){
+                store.dispatch(addNotification({message : `new Message from : ${message.sentBy} `}));
+            }
+            if (current_conversation?._id.toString() === data.conversation_id.toString()) {
               store.dispatch(
                 addDirectMessage(
                   {

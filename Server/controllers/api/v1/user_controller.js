@@ -203,7 +203,10 @@ module.exports.acceptFriend=async function(req, res){
           senderUser.save();
           return res.status(200).json({
             message:"friend Request accepted ! ",
-            senderSocketId:senderUser.socket_id,
+            data:{
+                    userId:senderUser,
+                    status :'accepted'
+                 },
             status:"success"
         })
 
