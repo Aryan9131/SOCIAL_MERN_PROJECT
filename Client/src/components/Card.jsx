@@ -62,7 +62,7 @@ export default function GeneralCard(props) {
               'Authorization': `Bearer ${token}`
             }
           });
-          if(removeLikeResponse.status==401 || removeLikeResponse.status==204){
+          if(addLikeResponse.status==401 || addLikeResponse.status==204){
             console.log('this is running to handle unautherized ***')
             localStorage.removeItem('token');
             localStorage.removeItem('user');
