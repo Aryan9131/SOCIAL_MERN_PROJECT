@@ -38,7 +38,7 @@ export default function ProfileCard({clickedUser, userFriendsLength, userPostsLe
       <CardContent sx={{width:"100%", lineHeight:"40px"}}>
         <Box sx={{display:"flex", flexDirection:"column",justifyContent:"center",alignItems:"center",width:"100%"}}>
            <Avatar alt={user._id.toString()==clickedUser._id.toString() ? user.name : clickedUser.name} 
-                   src={user._id.toString()==clickedUser._id.toString() ? user.avatar.url : clickedUser.avatar?.url} variant="rounded" sx={{borderRadius:"30px", width:"100px", height:"100px", margin:"10px 6px"}}/>
+                   src={user._id.toString()==clickedUser._id.toString() ? user.avatar?.url : clickedUser.avatar?.url} variant="rounded" sx={{borderRadius:"30px", width:"100px", height:"100px", margin:"10px 6px"}}/>
             <h1 style={{fontWeight:"600"}}>{user._id.toString()==clickedUser._id.toString() ? user.name : clickedUser.name}</h1>
             <Typography variant="body2" color="text.secondary" sx={{margin:"4px 5px", textAlign:"center"}}>
                 <b >About :</b> {user._id.toString()==clickedUser._id.toString() ? user.about : clickedUser.about}

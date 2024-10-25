@@ -84,7 +84,7 @@ export default function GeneralCard(props) {
     <Card sx={{ maxWidth: 300, minWidth: { sx: 260, md: 300 }, marginBottom: "15px", boxShadow: '0', border: "0px", borderRadius: "15px", padding: "10px 20px", boxSizing: "border-box" }}  >
       <CardHeader
         avatar={
-          <Avatar alt="Remy Sharp" src={post.user.avatar ? post.user.avatar.url : "https://mui.com/static/images/avatar/2.jpg"} variant="rounded" sx={{ cursor:"pointer", borderRadius: "15px" }} onClick={()=>navigate(`profile/${post.user._id}`)} />
+          <Avatar alt={post.user.name} src={post.user.avatar ? post.user.avatar.url : ""} variant="rounded" sx={{ cursor:"pointer", borderRadius: "15px" }} onClick={()=>navigate(`profile/${post.user._id}`)} />
         }
         action={
           deletePost && (post.user._id.toString()=== user_id.toString()) ?
