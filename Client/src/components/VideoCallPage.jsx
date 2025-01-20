@@ -40,7 +40,7 @@ export const VideoCallPage = () => {
       console.log('inside handleVideoCall: ', stream);
       sendStreams(peer.peer, stream)
       dispatch(setMyStream({ myStream: stream })); // Update Redux state
-      const offer = await peer?.getOffer();
+      const offer = await peer.getOffer();
       socket.emit('user:call', { otherPersonSocketId: current_conversation?.otherPersonSocketId, roomId: room_id, offer });
     } catch (error) {
       console.log('error inside handleVideoCall: ', error);
