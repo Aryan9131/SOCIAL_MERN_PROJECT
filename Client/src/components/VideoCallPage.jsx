@@ -105,7 +105,7 @@ export const VideoCallPage = () => {
       <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
         <Button color='success' onClick={handleVideoCall}>Call</Button>
         <Button color='error' onClick={handleEndCall}>End</Button>
-        <Button color='success' onClick={()=>{sendStreams(peer?.peer, myStream)}}>Stream</Button>
+        <Button color='success' onClick={handleVideoCall}>Stream</Button>
       </Box>
     </Box>
 
