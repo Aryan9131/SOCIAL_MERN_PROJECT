@@ -84,7 +84,7 @@ export default function BasicGrid() {
             console.log("inside previos conversation event")
             socket.emit('previous_conversations', { user_id }, (data) => {
                 console.log("fetched conversations -> " + JSON.stringify(data));
-                dispatch(fetchDirectConversations({ conversations: data }))
+                dispatch(fetchDirectConversations({ conversations: data, userId:user_id }))
             })
         }
         return () => {
@@ -117,7 +117,7 @@ export default function BasicGrid() {
                     <TabContext value={value} >
                         <Box sx={{ width: "100%", overflowX: "auto", borderBottom: 1, borderColor: 'divider', }}>
                             <TabList onChange={handleChange} sx={{ width: "300px", overflowX: "auto" }} aria-label="lab API tabs example">
-                                <Tab label="Direct" className='storiesNavItems' value="Direct_messages" />
+                                <Tab label="Direct" value="Direct_messages" />
                                 <Tab label="Group" value="Group_messages" />
                                 <Tab label="Archived" value="Archived" />
                             </TabList>

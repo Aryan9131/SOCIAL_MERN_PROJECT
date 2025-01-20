@@ -78,6 +78,7 @@ io.on('connection', async (socket) => {
             console.log('Erro in cron job : '+error)
         }
     });
+
     socket.on('deleteStory', async (story)=>{
         try {
             console.log('delete story event triggered' +JSON.stringify(story))
@@ -171,7 +172,7 @@ io.on('connection', async (socket) => {
         const existing_conversation = await OneToOneMessages.find({
             participants: { $all: [user_id] }
         })
-        const populated_exiting_conversation = await OneToOneMessages.populate(existing_conversation, { path: 'participants', select: '_id name username email status' });
+        const populated_exiting_conversation = await OneToOneMessages.populate(existing_conversation, { path: 'participants', select: '_id name username email status socket_id' });
 
         console.log("existing_conversation in previous conversaton --> " + populated_exiting_conversation);
         callback(populated_exiting_conversation)
@@ -219,7 +220,7 @@ io.on('connection', async (socket) => {
         try {
             const participants = await OneToOneMessages.findById(data.conversation_id).select('participants').populate(
                 "participants",
-                "name _id email status"
+                "name _id email status socket_id"
             );
             callback(participants.participants);
         } catch (error) {
@@ -325,7 +326,6 @@ io.on('connection', async (socket) => {
             console.log("Error while deleting msg ->" + JSON.stringify(error))
         }
     })
-
     // Make a new Group with the data come from frontEnd
     socket.on('new_group', async (groupData) => {
         console.log("groupData --> " + JSON.stringify(groupData));
@@ -350,7 +350,35 @@ io.on('connection', async (socket) => {
             }
         });
     })
+    
+    // socket.on('room:join', async(data)=>{
+    //      console.log('data came videocall --> '+JSON.stringify(data))
+    //      io.to(room_id).emit('user:joined',{name: data.userName} )    
+    //      io.to(socket.id).emit('room:join', data);
+    // })
+    socket.on('user:call', ({ otherPersonSocketId, roomId, offer})=>{
+        socket.join(roomId);
+        console.log('otherPersonSocketId come --> '+ otherPersonSocketId)
+        io.to(otherPersonSocketId).emit('incomming:call', {from : socket.id, offer })
+    })
 
+    socket.on('call:accepted', async ({to, ans})=>{
+       console.log('call:accepted', to , ans);
+       io.to(to).emit('call:accepted', {from : socket.id, ans});
+    })
+    socket.on('peer:nego:needed', async ({to, offer})=>{
+        console.log('peer:nego:needed', to , offer);
+        io.to(to).emit('peer:nego:needed', {from : socket.id, offer});
+     })
+     socket.on('peer:nego:complete', async ({to, ans})=>{
+        console.log('peer:nego:complete', to , ans);
+        io.to(to).emit('peer:nego:complete', {from : socket.id, ans});
+     })
+
+     socket.on('end:call', ({to})=>{
+        console.log('end call event backend ', to)
+       io.to(to).emit('end:call',{from : to});
+     })
 });
 
 server.listen(port, (err) => {

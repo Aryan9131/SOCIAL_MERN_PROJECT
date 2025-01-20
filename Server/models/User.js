@@ -48,7 +48,7 @@ const userSchema = new mongoose.Schema({
     avatar: {
         type:Object
     },
-    status: Boolean,
+    status: String,
     socket_id: String
 });
 

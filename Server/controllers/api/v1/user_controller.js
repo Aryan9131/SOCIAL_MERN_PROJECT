@@ -6,8 +6,11 @@ const OneToOneMessages =require('../../../models/OneToOneMessage')
 const jwt = require('jsonwebtoken');
 
 module.exports.createUser = async function (req, res) {
-    console.log(req.body);
-    const newUser = new User(req.body);
+    const user={
+        status:'offline',
+        ...req.body
+    }
+    const newUser = new User(user);
     newUser.save();
     return res.status(200).json({
         message: "User created successfully !",
@@ -23,6 +26,8 @@ module.exports.createSession = async function (req, res) {
                 message: "Invalid username/password"
             })
         }
+        user.status='online';
+        await user.save();
         return res.status(200).json({
             message: "SignIn successful !",
             data: {
@@ -36,7 +41,6 @@ module.exports.createSession = async function (req, res) {
         })
     }
 }
-
 
 module.exports.allPosts = async function (req, res) {
     try {
@@ -284,3 +288,11 @@ module.exports.updateProfile =async function(req, res){
     }
 }
 
+module.exports.logOut= async (req, res)=>{
+    const user=await User.findOne({_id:req.params.id});
+    user.status='offline';
+    await user.save();
+    return res.status(200).json({
+        message : 'user logout successfully !'
+    })
+  };

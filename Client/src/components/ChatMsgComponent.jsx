@@ -261,6 +261,7 @@ const DocComponent = function ({ msg, setRepliedMsg }) {
     )
 }
 const ChatMsgComponent = function ({setRepliedMsg}) {
+    const {user}=useSelector((state)=>state.user);
     const { conversations, current_messages } = useSelector((state) => state.conversations.direct_chat);
     console.log("current_messages in ChatMsgComponent -->" + JSON.stringify(current_messages))
     const { room_id } = useSelector((state) => state.conversations.direct_chat);
@@ -279,7 +280,7 @@ const ChatMsgComponent = function ({setRepliedMsg}) {
             socket.emit("get_messages", { conversation_id: current?._id }, (data) => {
                 // data => list of messages
                 console.log("List of messages in ChatMsgComponent -->" + JSON.stringify(data));
-                dispatch(fetchCurrentMessages({ messages: data }));
+                dispatch(fetchCurrentMessages({ messages: data, userId:user?._id }));
             });
 
         }

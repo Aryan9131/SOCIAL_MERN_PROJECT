@@ -23,10 +23,13 @@ export default function ProfileMenu() {
   const isXs = useMediaQuery(theme.breakpoints.down('xs')); // For extra-small screens
   const [socket, setSocket]=React.useState(undefined)
    // handleLogout
-   const handleLogOut = ()=>{
+   const handleLogOut = async ()=>{
       try {
         localStorage.removeItem('token');
         localStorage.removeItem('user');
+        const logOutResponse= await fetch(`${import.meta.env.VITE_BASE_URL}/user/${user._id}/logout`,{
+          method:"POST"
+        })
         window.location.reload()
       } catch (error) {
         console.log('error while deleting from localstorage for logOut : '+error)

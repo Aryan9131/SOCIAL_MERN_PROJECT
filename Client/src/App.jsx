@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import Layout from './components/Layout';
 import Home from './components/Home';
 import Stories from './components/Stories';
@@ -11,9 +11,16 @@ import SignUp from './components/SignUp'
 import Rehydrate from './components/RehydrateUser';
 import { useDispatch, useSelector } from 'react-redux';
 import getSocket, { connectSocket, disconnectSocket } from './utils/socketManager';
+import { VideoCallPage } from './components/VideoCallPage';
+import { setNavigate } from './utils/navigationService';
 
 const App = () => {
   let user = useSelector((state) => state.user).user;
+  const navigate= useNavigate();
+  
+  React.useEffect(() => {
+    setNavigate(navigate); // Set the navigation function globally
+  }, [navigate]);
 
   useEffect(() => {
     if (user) {
@@ -51,10 +58,10 @@ const App = () => {
 
   return (
     <Rehydrate>
-      <Router>
         <Routes>
           <Route path="/sign-up" element={<SignUp />} />
           <Route path="/sign-in" element={<SignIn />} />
+          <Route path="/video-call" element={<VideoCallPage />} />
           <Route path="/" element={user ? <Layout /> : <Navigate to="/sign-up" />}>
             <Route path="/" element={user ? <Home handleCardClick={handleCardClick} open={drawerOpen} toggleDrawer={toggleDrawer} clickedPost={clickedPost} /> : <Navigate to="/sign-up" />} />
             <Route path="/stories" element={user ? <Stories /> : <Navigate to="/sign-up" />} />
@@ -63,7 +70,6 @@ const App = () => {
             <Route path="/profile/:id" element={user ? <Profile handleCardClick={handleCardClick}  open={drawerOpen} toggleDrawer={toggleDrawer} clickedPost={clickedPost} /> : <Navigate to="/sign-up" />} />
           </Route>
         </Routes>
-      </Router>
     </Rehydrate>
   );
 };

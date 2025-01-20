@@ -21,14 +21,12 @@ const ExistingConversations = ({ type }) => {
     return (
         <Box sx={{ height: { xs: "100vh", md: "80vh" }, overflowY: 'auto' }} id="messagesContainer">
             {
-                conversations
-                &&
-                conversations.map((conversation) => {
+                conversations?.map((conversation) => {
                     return (
                         type == 'single' && conversation.isGroup == false
                             ?
                             <Box key={conversation._id} sx={{ borderRadius: "8px", margin: "5px 2px", padding: "14px 4px", display: "flex", justifyContent: "space-between", alignItems: "center", backgroundColor: clickedConversationId == conversation._id ? "lightgrey" : "whitesmoke" }} onClick={() => handleConversationClicked(conversation._id)}>
-                                <Avatar alt="Remy Sharp" src="https://mui.com/static/images/avatar/2.jpg" sx={{ height: "40px", width: "40px" }} />
+                                <Avatar alt="Remy Sharp" src={conversation.avatar} sx={{ height: "40px", width: "40px" }} />
                                 <Box sx={{ flex: "1", display: "flex", flexDirection: "column" }}>
                                     <Box sx={{ marginLeft: "30px", display: "flex", justifyContent: "space-between" }}>
                                         <p> {conversation.name}</p>

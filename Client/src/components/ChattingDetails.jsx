@@ -34,6 +34,7 @@ import DownloadIcon from '@mui/icons-material/Download';
 import { Typography } from "@mui/material"
 import CancelIcon from '@mui/icons-material/Cancel';
 import { fetchCurrentParticipants, updateDirectConversation } from '../features/conversationSlice'
+import { useNavigate } from "react-router-dom";
 const StyledTextField = styled(TextField)({
     '& .MuiOutlinedInput-root': {
         '& fieldset': {
@@ -315,8 +316,7 @@ const ChattingDetails = function () {
             </Box>
         )
     };
-
-
+    const navigate= useNavigate();
     const dispatch = useDispatch()
     useEffect(() => {
         setSocket(getSocket());
@@ -333,6 +333,12 @@ const ChattingDetails = function () {
             setRepliedMsg(undefined)
         };
     }, [socket, current_messages])
+    
+    const handleVideoCallClick = async ()=>{
+        console.log('*** video call icon clicked !')
+        // socket.emit('room:join',{userName : user?.name , roomId: room_id})
+        navigate(`/video-call`);
+    }
     return (
         <Grid container id="chattingDetailsId" sx={{ position: "relative", height: "100vh", display: "flex", backgroundColor: "#b9e2fa" }} >
             <Grid item xs={12} sx={{ height: "10%", backgroundColor: "white", borderBottomLeftRadius: "10px", borderBottomRightRadius: "10px", position: "sticky", top: "0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -344,9 +350,9 @@ const ChattingDetails = function () {
                         </Box>
                     </Box>
                     <Box sx={{ width: "25%", display: "flex", justifyContent: "flex-end" ,alignItems:"center"}}>
-                        <CallOutlinedIcon className="chatNavIcon" sx={{ marginRight: "10px", color: "rgba(50, 50, 50, 1)", height: "22px" }} />
-                        <VideocamOutlinedIcon className="chatNavIcon" sx={{ marginRight: {xs:'0px', md:"10px"}, color: "rgba(50, 50, 50, 1)", height: "23px" }} />
-                        <SearchIcon className="chatNavIcon" sx={{ marginRight: {xs:'0px', md:"10px"}, color: "rgba(50, 50, 50, 1)", height: "23px" }} />
+                        <CallOutlinedIcon className="chatNavIcon" sx={{'&:hover':{cursor:'pointer', backgroundColor:'rgba(188, 187, 187, 0.68)'}, marginRight: "10px", color: "rgba(50, 50, 50, 1)", height: "22px" }} />
+                        <VideocamOutlinedIcon className="chatNavIcon" sx={{ '&:hover':{cursor:'pointer', backgroundColor:'rgba(188, 187, 187, 0.68)'}, marginRight: {xs:'0px', md:"10px"}, color: "rgba(50, 50, 50, 1)", height: "23px" }} onClick={handleVideoCallClick}/>
+                        <SearchIcon className="chatNavIcon" sx={{'&:hover':{cursor:'pointer', backgroundColor:'rgba(188, 187, 187, 0.68)'}, marginRight: {xs:'0px', md:"10px"}, color: "rgba(50, 50, 50, 1)", height: "23px" }} />
                     </Box>
                 </Box>
 

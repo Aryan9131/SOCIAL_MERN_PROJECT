@@ -4,6 +4,10 @@ import { addNotification } from '../features/socketSlice';
 import {selectConversation} from '../features/conversationSlice' 
 import {deleteDirectMessage, addDirectMessage, addDirectConversation, updateDirectConversation } from '../features/conversationSlice';
 import { setClickedConversationId, deleteStory } from "../features/conversationSlice";
+import peer from '../utils/peer';
+import { navigateTo } from '../utils/navigationService';
+import { removeMyTracks, removeOtherUserTracks, setMyStream } from '../features/streamingSlice';
+import sendStreams from '../utils/sendStreamService';
 
 let socket;
 export const connectSocket = (user_id) => {
@@ -122,6 +126,44 @@ export const connectSocket = (user_id) => {
             console.log("message_delete triggered")
             const state = store.getState();
             store.dispatch(deleteDirectMessage(data))
+        });
+        
+        socket.on('incomming:call', async ({from , offer})=>{
+            console.log('incomming:call : ', from , offer);
+            navigateTo('/video-call')
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
+            // Dispatch the stream to Redux
+            store.dispatch(setMyStream({myStream : stream}));
+
+             // Send local stream to peer connection immediately
+            sendStreams(peer.peer, stream);
+            const ans= await peer.getAnswer(offer)
+            socket.emit('call:accepted', {to:from, ans});
+        })
+        
+        socket.on('call:accepted',async ({from, ans})=>{
+            console.log('call:accepted : ', from , ans);
+            await peer.setRemoteDescription(new RTCSessionDescription(ans));
+            console.log('printing stream : '+ store.myStream);
+            // Ensure local stream is sent again after setting remote description
+             sendStreams(peer.peer, store.getState().stream.myStream);
+        })
+
+        socket.on('peer:nego:needed', async ({ from, offer }) => {
+            console.log('incoming peer:nego:needed: ', from, offer);
+            const ans = await peer.getAnswer(offer);
+            socket.emit('peer:nego:complete', { to: from, ans });
+        })
+        
+        socket.on('peer:nego:complete',async ({from, ans})=>{
+            console.log(' incoming peer:nego:complete : ', from , ans);
+            await peer.setRemoteDescription(new RTCSessionDescription(ans)); // Set answer as remote description
+            sendStreams(peer.peer, store.myStream); 
+        })
+
+        socket.on('end:call', ({from})=>{
+            console.log('end:call frontEnd ', from )
+            navigateTo('/messages');
         })
     }
 };

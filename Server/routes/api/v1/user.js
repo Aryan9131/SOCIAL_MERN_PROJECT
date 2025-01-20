@@ -14,4 +14,5 @@ router.get('/get-users/:id',UserController.getAllUSers)
 router.post('/add-friend',passport.authenticate('jwt', {session:false}), UserController.addFriend)
 router.post('/accept-friend-request',passport.authenticate('jwt', {session:false}), UserController.acceptFriend);
 router.post('/update-profile',passport.authenticate('jwt', {session:false}),UserController.updateProfile)
+router.post('/:id/logout',UserController.logOut);
 module.exports=router

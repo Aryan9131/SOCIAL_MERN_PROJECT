@@ -57,9 +57,10 @@ const conversationSlice = createSlice({
     fetchDirectConversations: (state, action) => {
       console.log("conversations get in fetchDirectConversations --> " + JSON.stringify(action.payload.conversations))
       const list = action.payload.conversations.map((oneToOneMessage) => {
-        let otherUser = oneToOneMessage.participants.find(
-          (participant) => participant._id.toString() != user_id.toString()
-        )
+        let otherUser = oneToOneMessage.participants[0];
+        if(otherUser?._id.toString()==action.payload.userId.toString()){
+          otherUser=oneToOneMessage.participants[1];
+        }
         const lastMsg=oneToOneMessage.messages.length>0 ? oneToOneMessage.messages[oneToOneMessage.messages.length-1] : undefined;
         const lastTime = lastMsg ? new Date(lastMsg.created_at).toLocaleTimeString('en-US', {
                                     hour: '2-digit',
@@ -67,12 +68,14 @@ const conversationSlice = createSlice({
                                     hour12: false // Use true for 12-hour format, false for 24-hour format
                                   })
                                  : undefined;
-        return {
+        console.log('other user avatar --------> '+JSON.stringify(otherUser))
+                                 return {
           _id: oneToOneMessage._id,
           user_id: otherUser?._id,
           name: oneToOneMessage.isGroup ? oneToOneMessage.groupName : `${otherUser.name}`,
-          online: otherUser?.status === "Online",
-          avatar: `https://mui.com/static/images/avatar/2.jpg`,
+          online: otherUser?.status,
+          avatar: otherUser && otherUser.avatar ? otherUser.avatar.url : "" ,
+          otherPersonSocketId : otherUser?.socket_id,
           msg: lastMsg ? lastMsg.data : "",
           time: lastTime,
           unread: 0,
@@ -97,15 +100,16 @@ const conversationSlice = createSlice({
           if (el?._id !== this_conversation._id) {
             return el;
           } else {
-            const user = this_conversation.participants.find(
-              (elm) => elm._id.toString() !== user_id
-            );
+            let otherUser = oneToOneMessage.participants[0];
+            if(otherUser?._id.toString()==action.payload.userId.toString()){
+              otherUser=oneToOneMessage.participants[1];
+            }
             return {
               _id: this_conversation._id,
-              user_id: user?._id,
-              name: `${user.name}`,
-              online: user?.status === true,
-              avatar: "https://mui.com/static/images/avatar/2.jpg",
+              user_id: otherUser?._id,
+              name: `${otherUser.name}`,
+              online: otherUser?.status,
+              avatar: otherUser && otherUser.avatar ? otherUser.avatar.url : "" ,
               msg: lastMsg ? lastMsg.data : undefined,
               time: lastTime,
               unread: 0,
@@ -151,7 +155,7 @@ const conversationSlice = createSlice({
         data: el.data,
         file: el.file,
         repliedMsgData: el.repliedMsgData,
-        isSent: el.from.toString() === user_id.toString(),
+        isSent: el.from.toString() === action.payload.userId.toString(),
       }));
       state.direct_chat.current_messages = formatted_messages;
     },
